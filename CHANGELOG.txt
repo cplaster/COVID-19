@@ -1,0 +1,157 @@
+﻿v1.0.0.5 @cplaster 2020-04-20T17:13:00
+
+* Fixed the previous issue with how "provinces" are handled. The special cases for Australia, Canada, and China are melded in with the parent country, for
+  the rest, they are just promoted to their own countries. It looks like everything works the way it should. I suspect there might be a cleaner way to do 
+  the logic for this, but it works so I am leaving it alone for now.
+
+
+v1.0.0.5 @cplaster 2020-04-20T15:19:00
+
+* Refactored DataSet.cs and gutted a lot of old and/or crufty code. The DataSet class handles data aquisition all by itself, and just directly pulls from
+  the respective sources (like GitHub). Does not include support for files, but it shouldn't really be needed going forward.
+
+* There is a problem with the way JHU presents the global data. First, there is data for each province for Australia, Canada, and China, but not other countries. Why?
+  Then, the same Province field is also used for places like Greenland and Faroe Islands, which I don't really consider "provinces" of Denmark in the same sense that the aformentioned
+  mainland provinces of Australia and the rest are.
+
+  The reason for that, is the example where there are a lot of islands in the Caribbean that belong to various countries, but otherwise really don't have anything much to do 
+  with the parent countries in this context. If I want to look at the data for Aruba, it is irrelevant that it belongs to Netherlands. I wouldn't consider Puerto Rico or Guam
+  to be part of the US in this context either, although they are just lumped in with the US figures as-is, which is another inconsistancy :-/
+
+  The way things are currently handled is that each province is built as a separate Location item, and then included in its parent country's Location.Items list.
+  Then, the Stats for the parent country are aggregated from the respective provinces. Its done this way because there is no separate datum for say, Australia, just its
+  individual provinces. So far, that's not a problem. 
+
+  But cases like Denmark that presents us with some problems:
+    1) Neither Greenland or Faroe Islands are a part of mainland Denmark, so this skews Denmark's numbers since they are both aggregated into whatever the mainland total already was.
+    2) Since these "provinces" are filed under Denmark.Items(), they don't show up under the country selector, which I consider to be the wrong behavior. Thats fine for
+       the "mainland provinces" case, but not here.
+
+  I don't really want to start building a bunch of "special-cases" into the parser, but I have to if I want the desired behavior.
+
+  What should happen (at least for now), is that each of those "mainland provinces" continue to be filed under their respective parent countries, but ones that aren't this special case
+  are just promoted to full-blown countries of their own. In this instance, the promoted provinces' data shouldn't be aggregated under the parent country.
+
+
+v1.0.0.5 @cplaster 2020-04-13T20:43:00
+
+* Implemented the mortality rate feature. Also added Survival rate, which is (Recovered/Confirmed)*100
+  Obviously these figures are wildly inaccurate for a variety of reasons, but interesting nonetheless.
+
+* The JHU database implemented some interesting figures per state in the daily_reports_us (which we don't currently use).
+  Most of this data is already included in the covidtracking.com data, or are ratios i've already implemented. 
+  I wouldn't be surprised to see this propagated to the time_series data (which we DO use), so that's something to watch out for.
+
+v1.0.0.5 @cplaster 2020-04-13T18:42:00
+
+* It might be interesting to show mortality rate when the Deaths data type is selected. Something like (Deaths/Confirmed)*100
+
+v1.0.0.5 @cplaster 2020-04-13T17:43:00
+
+* Automated JHU GitHub pull. Currently, we default to just using the existing binFile (if there is one) instead of doing a pull, but the JSON files get pulled every load.
+  I'll fix this behavior next.
+
+  We can do File->Reload to force a full refresh pull.
+
+  There isn't a very good way to autodetect whether or not the data files have been updated on the web, so we probably should have some logic that checks if the
+  existing binFile is older than some value (say a day, or 12 hours, or whatever), and just force a full refresh pull if the binFile is older than that value.
+
+* There are a bunch of bugs that need to be squashed
+
+  - The Data Type combobox needs to have some awareness with respect to the selection in the Area combobox. Specifically, the World and US County selections only support
+    Confirmed, Recovered, and Deaths, so those should be the only options. For the United States selection, we can show all the Data Type options. [FIXED]
+
+  - There is pretty nominal error checking for a lot of things, which could cause unhandled exceptions under odd circumstances.
+
+v1.0.0.5 @cplaster 2020-04-13T15:08:00
+
+* The csv files from the covidtracking.com site are kind of a mess and hard to parse, so I used the JSON files instead. Same information, just easier to parse.
+  The relevant information is held in the DataPoints class, which in turn is at Location.DataPoints.
+
+  Added the QuickType namespace and a couple of generated classes from https://app.quicktype.io/ to parse the JSON files.
+
+  Added the relevant selections to the Data Type combobox.
+
+  Still would like to automate the GitHub pull for the JHU data, so that's next on the list.
+   
+
+v1.0.0.5 @cplaster 2020-04-12T14:00:00
+
+* There is some additional data that tracks much more detailed information for US states (and for the US as a whole) that I want to also incorporate.
+  Happily, these are availible via plain old JSON HTTP GET requests, so that data doesn't have to be synched from github.
+
+  The main site: https://covidtracking.com/api
+
+  The relevant data (historical) for the states is at: https://covidtracking.com/api/v1/states/daily.csv
+
+  Additional per-state metadata is availible at: https://covidtracking.com/api/v1/states/info.csv
+
+  The best way to incorporate this data into the existing data structure is probably to just create a struct in the Location class that
+  encapsulates all the various datapoints (the existing confirmed, deaths, and recovered; along with the new ones like the various hospitalized, onventilator, testresults, etc)
+  All of that is in the daily.csv
+
+  For our purposes, the info.csv pretty much just provides a relation between the state codes and the state names. There is other interesting information there, but its not 
+  really relevant for graphing purposes.
+
+
+v1.0.0.5 @cplaster 2020-04-06T20:23:00
+
+* Worked out a much better way to parse the data for those edge cases, but all the data in general. It should also make any changes to the data schema much easier to deal with.
+  
+  [FIXED]
+  - Use this parsing method for the global population statistics as well, as the schema for that has changed several times in the few days.
+
+  - Still need to address the color problem.
+
+v1.0.0.5 @cplaster 2020-04-06T16:24:00
+
+* Global population is now propagated to the dataset.
+
+    [FIXED]
+    - There is a minor bug here, however. In a few edge cases where the country name is quoted and contains commas (i.e. "Korea, South"), there is a disconnect in 
+      naming convention between the population data and the case data. In this case, the country's population data doesn't propagate correctly. This has to do 
+      with the somewhat hacky way I parse these lines
+
+
+v1.0.0.5 @cplaster 2020-04-06T15:12:00
+
+* The normalization/logarmithmic bug has been squashed. This was actually a problem with the graph object not being initialized/reset correctly. The problem did not 
+  originate in the toggle logic.
+
+* There is updated information regarding global population statistics, so the next thing to do is parse that and populate the dataset with that information as well.
+
+* No update on the color problem :-/
+
+
+v1.0.0.5 @cplaster 2020-04-06T13:00:00
+
+* The deaths_US.csv file contains a new column for county population, which is sufficient to generate population totals for each state, and also the entire country.
+  An update needs to be added to the parser to account for this. Its actually just dumb luck that this change in the schema doesn't actually break anything.
+  The population numbers would be useful for generating graphs showing each statistic in proportion to each area's population size.
+
+* I'm still not satisfied with the random colors that get generated for each graph line. I've tried a few different approaches, including different libraries that 
+  purport to address some of the problems I've run across, but so far generating random RGB triplets has worked better than anything else. Still, there are problems:
+
+    1) The colors are too light or too dark. Light colors don't show up well against a white background, and very dark colors tend to look too similar since they are so close to black
+       - This can be mitgated somewhat by limiting the range for each portion of the RGB triplet, but the problem with doing so is that the colors tend to tinged shades of grey
+         which is not acceptable.
+
+    2) The colors are truly random, so its possible to generate several colors that appear very similar, even if their RGB values are wildly different.
+       - It has been suggested on many forums to use HSL (Hue-Saturation-Luminosity) as opposed to RGB to avoid this, although libraries I've tried that use this approach
+         generate hilariously similar colors, or again just shades of grey. For most of the libraries I've tried, the documentation is nearly nonexistant, so in the end this might
+         be user-error on my part for not properly understanding how to use the libraries. 
+
+ I'm not that familiar with HSL, so it might be best to try to build some simple HSL functions myself, so I better understand what's going on 'under the hood'.
+
+ Another option is to just create an arbitrary list of colors that contrast well enough to my liking. If we need more colors than the list contains, it might be possible to generate
+ more colors on-the-fly by tweaking the existing colors' values. 
+
+ In any case, it seems like a really dumb problem to have, given everything else pretty much works the way it should.
+
+ * There is a bug that I haven't been quite able to track down, or indeed even reliably reproduce. Sometimes, when toggling between normalization (and modifying its value) and toggling
+   logarithmic modes. It just totally borks the graph, even after changing other things. This is interesting, because the PlotGraph() function shouldn't modify the exisiting dataset.
+   I say shouldn't, because there is a chance that i'm effectively modifying the contents of POINTERS of the values, rather than separate copies of the dataset values. 
+   That shouldn't be the case, but I'll have to monitor for any modifications to the dataset to know that for sure.
+
+   Ruling that out, there must be some edge cases where either normalization or logarithmic mode toggles (or indeed, the interaction between the two) are doing something they
+   shouldn't. Its also possible that the problem might reside in how the header gets generated when these toggles are used.
