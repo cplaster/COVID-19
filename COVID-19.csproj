@@ -166,10 +166,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="Releases\COVID-19_1_0_0_10.zip" />
-    <None Include="Releases\COVID-19_1_0_0_11.zip" />
-    <None Include="Releases\COVID-19_1_0_0_8.zip" />
-    <None Include="Releases\COVID-19_1_0_0_9.zip" />
+    <None Include="Releases\COVID-19_1_0_0_6.zip" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

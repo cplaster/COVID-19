@@ -47,7 +47,6 @@ namespace COVID_19
         bool useSurvival = false;
         Dictionary<string, Color> colors = new Dictionary<string, Color>();
         Dictionary<string, Location> countyStore = new Dictionary<string, Location>();
-        //string filepath = @"C:\Users\Chad\Documents\GitHub\COVID-19\csse_covid_19_data\csse_covid_19_time_series";
         string filepath = ".\\Data";
         DateTime lastUpdatedData;
         DateTime lastUpdatedFiles;
@@ -57,8 +56,6 @@ namespace COVID_19
         {
             InitializeComponent();
 
-            var currentDirectory = new DirectoryInfo(Environment.CurrentDirectory);
-            MessageBox.Show("updated 11");
             AutoUpdater.Start("https://raw.githubusercontent.com/cplaster/COVID-19/master/Releases/Updater.xml");
 
             LoadData();
