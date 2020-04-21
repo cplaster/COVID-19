@@ -167,6 +167,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="Releases\COVID-19_1_0_0_6.zip" />
+    <None Include="Releases\COVID-19_current.zip" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

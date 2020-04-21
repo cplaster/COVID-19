@@ -1,4 +1,13 @@
-﻿v1.0.0.5 @cplaster 2020-04-20T17:13:00
+﻿v1.0.0.6 @cplaster 2020-04-20T20:31:00
+
+* Pushed the current codebase to GitHub at https://github.com/cplaster/COVID-19. 
+  The current compiled release can be found at https://github.com/cplaster/COVID-19/tree/master/Releases/COVID-19_current.zip
+
+  I also added autoupdate functionality, so new updates will availible starting from version 1.0.0.6. If there is a new update, it should tell you that and give you the 
+  option to download it. It will automagically do that, and restart. It also allows me to force the update, but I won't do that unless it is necessary due to a 
+  data schema change that breaks things.
+
+v1.0.0.5 @cplaster 2020-04-20T17:13:00
 
 * Fixed the previous issue with how "provinces" are handled. The special cases for Australia, Canada, and China are melded in with the parent country, for
   the rest, they are just promoted to their own countries. It looks like everything works the way it should. I suspect there might be a cleaner way to do 
