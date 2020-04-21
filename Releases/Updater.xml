@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <item>
   <version>1.0.0.7</version>
-  <url>https://raw.githubusercontent.com/cplaster/COVID-19/master/Releases/COVID-current.zip</url>
+  <url>https://raw.githubusercontent.com/cplaster/COVID-19/master/Releases/COVID-19_current.zip</url>
   <changelog>https://github.com/cplaster/COVID-19/blob/master/CHANGELOG.txt</changelog>
   <mandatory>false</mandatory>
 </item>
