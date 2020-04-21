@@ -57,6 +57,8 @@ namespace COVID_19
         {
             InitializeComponent();
 
+            var currentDirectory = new DirectoryInfo(Environment.CurrentDirectory);
+            MessageBox.Show(currentDirectory.FullName);
             AutoUpdater.Start("https://raw.githubusercontent.com/cplaster/COVID-19/master/Releases/Updater.xml");
 
             LoadData();
