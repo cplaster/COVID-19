@@ -856,5 +856,12 @@ namespace COVID_19
             useSurvival = false;
             GenerateGraph();
         }
+
+        private void MenuItem_About_Click(object sender, RoutedEventArgs e)
+        {
+            Window w = new About();
+            w.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            w.Show();
+        }
     }
 }

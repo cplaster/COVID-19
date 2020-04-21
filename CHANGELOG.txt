@@ -1,4 +1,8 @@
-﻿v1.0.0.6 @cplaster 2020-04-20T20:31:00
+﻿v1.0.0.7 @cplaster 2020-04-20T22:02:00
+
+* Added an About box under the Help menu.
+
+v1.0.0.6 @cplaster 2020-04-20T20:31:00
 
 * Pushed the current codebase to GitHub at https://github.com/cplaster/COVID-19. 
   The current compiled release can be found at https://github.com/cplaster/COVID-19/tree/master/Releases/COVID-19_current.zip

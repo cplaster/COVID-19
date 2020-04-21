@@ -11,13 +11,21 @@
 
         <StackPanel Orientation="Vertical">
             <Grid>
-                <DockPanel>
+                <DockPanel HorizontalAlignment="Stretch">
                     <Menu DockPanel.Dock="Top">
+                        <Menu.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <DockPanel HorizontalAlignment="Stretch"/>
+                            </ItemsPanelTemplate>
+                        </Menu.ItemsPanel>
                         <MenuItem Header="_File">
                             <MenuItem Header="_Open" Click="MenuItem_Open_Click" />
                             <MenuItem Header="_Reload" Click="MenuItem_Reload_Click" />
                             <Separator />
                             <MenuItem Header="_Exit" Click="MenuItem_Exit_Click" />
+                        </MenuItem>
+                        <MenuItem Header="_Help" HorizontalAlignment="Right">
+                            <MenuItem Header="_About" Click="MenuItem_About_Click" /> 
                         </MenuItem>
                     </Menu>
                 </DockPanel>

@@ -1,0 +1,29 @@
+﻿<Window x:Class="COVID_19.About"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:COVID_19"
+        mc:Ignorable="d"
+        Title="About" Height="229.125" Width="405.329">
+    <Grid Margin="25,25,25.429,91.571">
+        <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Horizontal">
+                <Label>Application:</Label>
+                <Label>COVID-19</Label>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label>Version:</Label>
+                <Label Name="lblAppVersion">1.0.0.0</Label>
+                <Label>Copyright © 2020 Chad Plaster</Label>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label>Website:</Label>
+                <TextBlock Margin="0,5,0,0">
+                    <Hyperlink NavigateUri="https://github.com/cplaster/COVID-19" RequestNavigate="Hyperlink_Click">https://github.com/cplaster/COVID-19</Hyperlink>
+                </TextBlock>
+            </StackPanel>
+        </StackPanel>
+        <Button Name="btnOK" VerticalAlignment="Bottom" Margin="314,0,-15,-80" Click="btnOK_Click">OK</Button>
+    </Grid>
+</Window>
