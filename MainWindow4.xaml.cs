@@ -57,6 +57,8 @@ namespace COVID_19
         {
             InitializeComponent();
 
+            AutoUpdater.Start("https://raw.githubusercontent.com/cplaster/COVID-19/master/Releases/Updater.xml");
+
             LoadData();
             lbSelected.ItemsSource = lbSelectedItemsSource;
             lbSelectedItemsSource.CollectionChanged += LbSelectedItemsSource_CollectionChanged;
