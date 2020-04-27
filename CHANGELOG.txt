@@ -1,4 +1,13 @@
-﻿v1.0.0.7 @cplaster 2020-04-20T22:02:00
+﻿v1.0.0.8 @cplaster 2020-04-27T10:10:00
+
+* Fixed a bug when parsing location data.
+
+v1.0.0.7 @cplaster 2020-04-22T17:56:00
+
+* It might be helpful to auto-select based off criteria like Date range and Percentile range. For instance, I want to select all states' [Positive Increase] that are in the 
+  in the 80 to 100 percentile range from Apr 1 to Apr 20. Or maybe where each state's average rate of change is inside (or outside) a certain threshold.
+
+v1.0.0.7 @cplaster 2020-04-20T22:02:00
 
 * Added an About box under the Help menu.
 

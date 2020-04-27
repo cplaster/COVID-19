@@ -133,8 +133,10 @@ namespace COVID_19
                         fips = Int32.Parse((item["FIPS"].Split(".".ToCharArray()))[0]);
                     }
                     string stateName = item["Province_State"];
-                    double latitude = Double.Parse(item["Lat"]);
-                    double longitude = Double.Parse(item["Long_"]);
+                    double latitude = 0.0;
+                    double longitude = 0.0;
+                    Double.TryParse(item["Lat"], out latitude);
+                    Double.TryParse(item["Long_"], out longitude);
                     string combinedKey = item["Combined_Key"];
                     string countyName = item["Admin2"];
                     int population = 0;
