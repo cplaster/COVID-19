@@ -172,6 +172,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="README.md" />
     <None Include="Releases\COVID-19_current.zip" />
   </ItemGroup>
   <ItemGroup>
@@ -196,5 +197,10 @@
     <Resource Include="Releases\Updater.xml" />
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Images\covid-19v1.0.0.10-4.png" />
+    <Resource Include="Images\covid-19v1.0.0.10-5.png" />
+    <Resource Include="Images\covid-19v1.0.0.10-6.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
