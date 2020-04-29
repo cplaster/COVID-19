@@ -1,4 +1,4 @@
-﻿<Window x:Class="COVID_19.MainWindow4"
+﻿<Window x:Class="COVID_19.MainWindow5"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,7 +6,7 @@
         xmlns:d3="clr-namespace:InteractiveDataDisplay.WPF;assembly=InteractiveDataDisplay.WPF"
         xmlns:local="clr-namespace:COVID_19"
         mc:Ignorable="d"
-        Title="COVID-19" Height="670.92" Width="1205.731" Closing="Window_Closing" Loaded="Window_Loaded">
+        Title="COVID-19" Height="799.492" Width="1205.731" Closing="Window_Closing" Loaded="Window_Loaded">
     <Grid>
 
         <StackPanel Orientation="Vertical">
@@ -19,13 +19,12 @@
                             </ItemsPanelTemplate>
                         </Menu.ItemsPanel>
                         <MenuItem Header="_File">
-                            <MenuItem Header="_Open" Click="MenuItem_Open_Click" />
                             <MenuItem Header="_Reload" Click="MenuItem_Reload_Click" />
                             <Separator />
                             <MenuItem Header="_Exit" Click="MenuItem_Exit_Click" />
                         </MenuItem>
                         <MenuItem Header="_Help" HorizontalAlignment="Right">
-                            <MenuItem Header="_About" Click="MenuItem_About_Click" /> 
+                            <MenuItem Header="_About" Click="MenuItem_About_Click" />
                         </MenuItem>
                     </Menu>
                 </DockPanel>
@@ -95,19 +94,36 @@
                         <Label>Survival Rate</Label>
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" Margin="10,5,0,0">
-                        <Button Name="btnRangeFilters" Click="btnRangeFilters_Click">Range Filters...</Button>
+                    <StackPanel Orientation="Vertical" Margin="10,5,0,0">
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                            <Label>Start Date:</Label>
+                            <DatePicker Name="dpStart" SelectedDate="1/22/2020" SelectedDateChanged="dpStart_SelectedDateChanged"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                            <Label>End Date:</Label>
+                            <DatePicker Name="dpEnd" Margin="4,0,0,0" SelectedDate="4/26/2020" SelectedDateChanged="dpEnd_SelectedDateChanged" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                            <Label>Percentile Range:</Label>
+                            <TextBox Name="txtPercentileStart" Text="90.0" Height="19" />
+                            <Label>to</Label>
+                            <TextBox Name="txtPercentileEnd" Text="100.0" Height="19" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
+                            <Button Name="btnApplyRange" Padding="5" Click="btnApplyRange_Click">Apply Range Filter</Button>
+                            <Button Name="btnClear" Margin="15,0,10,0" Padding="5" Content="Clear" Click="btnClear_Click" />
+                        </StackPanel>
                     </StackPanel>
 
                     <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Margin="10,0,10,10">
                         <Label Name="lblArea" FontWeight="Bold" Margin="0,10,0,0">Country</Label>
-                        <ComboBox Margin="5,0,0,0" Name="cmbCountry" IsEditable="True" SelectionChanged="cmbCountry_SelectionChanged" DropDownClosed="cmbCountry_DropDownClosed" PreviewKeyDown="cmbCountry_PreviewKeyDown">
+                        <ComboBox Margin="5,0,0,0" Name="cmbCountry" IsEditable="True"   DropDownClosed="cmbCountry_DropDownClosed" PreviewKeyDown="cmbCountry_PreviewKeyDown">
                         </ComboBox>
                         <Label FontWeight="Bold" Margin="0,10,0,0">Selected</Label>
                         <ListBox Name="lbSelected" Margin="5,0,0,0" Height="270" SelectionMode="Extended" MouseDoubleClick="lbSelected_MouseDoubleClick"  />
 
                     </StackPanel>
-                    <Button Name="btnClear" Margin="15,0,10,0" Content="Clear" Click="btnClear_Click" />
+                    
                 </StackPanel>
 
                 <Grid Grid.Column="1" Grid.RowSpan="2" Height="575" Margin="32,20,32,0">
@@ -117,9 +133,6 @@
                 </Grid>
             </Grid>
         </StackPanel>
-
-
-
+        
     </Grid>
 </Window>
-

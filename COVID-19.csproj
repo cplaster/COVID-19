@@ -127,11 +127,10 @@
     <Compile Include="About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DataSetOLD.cs" />
     <Compile Include="DataSet.cs" />
     <Compile Include="HSLColor.cs" />
-    <Compile Include="MainWindow4.xaml.cs">
-      <DependentUpon>MainWindow4.xaml</DependentUpon>
+    <Compile Include="MainWindow5.xaml.cs">
+      <DependentUpon>MainWindow5.xaml</DependentUpon>
     </Compile>
     <Compile Include="StateData.cs" />
     <Compile Include="StateInfo.cs" />
@@ -144,7 +143,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainWindow4.xaml">
+    <Page Include="MainWindow5.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

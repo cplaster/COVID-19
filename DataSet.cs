@@ -16,12 +16,14 @@ namespace COVID_19
     {
         private Location us;
         private Location world;
+        private List<string> jsonHeader;
         private List<string> usHeader;
         private List<string> worldHeader;
         private Dictionary<string, string> rawData = new Dictionary<string, string>();
 
         public Location Us { get { return us; } }
         public Location World { get { return world; } }
+        public List<string> JsonHeader { get { return jsonHeader; } }
         public List<string> UsHeader { get { return usHeader; } }
         public List<string> WorldHeader { get { return worldHeader; } }
 
@@ -509,7 +511,9 @@ namespace COVID_19
 
             foreach (var key in item.Keys)
             {
-                ret.Add(key);
+                // the date format is m/d/yy, we want m/d/yyyy
+                var date = key + "20";
+                ret.Add(date);
             }
 
             return ret;
@@ -564,12 +568,33 @@ namespace COVID_19
 
             //first, figure out the datawidth, which is the number of unique days
             var widthList = new List<long>();
+            jsonHeader = new List<string>();
             foreach (var sData in stateData)
             {
                 long date = sData.Date;
+
                 if (!widthList.Contains(date))
                 {
                     widthList.Insert(0, date);
+                    string sDate = sData.Date.ToString();
+                    //the date format here is YYYYMMDD
+                    var year = sDate.Substring(0, 4);
+                    var month = sDate.Substring(4, 2);
+                    var day = sDate.Substring(6, 2);
+
+                    if (month.Substring(0, 1) == "0")
+                    {
+                        month = month.Substring(1, 1);
+                    }
+
+                    if (day.Substring(0, 1) == "0")
+                    {
+                        day = day.Substring(1, 1);
+                    }
+
+                    sDate = month + "/" + day + "/" + year;
+                    jsonHeader.Insert(0, sDate);
+
                 }
             }
 
@@ -777,13 +802,22 @@ namespace COVID_19
         }
 
         [Serializable]
+        public struct LocationData
+        {
+            public string Name;
+            public long Population;
+            public List<long> Confirmed;
+            public List<double> Data;
+        }
+
+        [Serializable]
         public class LocationInfo
         {
             public int FIPS { get; set; }
             public double Latitude { get; set; }
             public double Longitude { get; set; }
             public string CombinedName { get; set; }
-            public int Population { get; set; }
+            public long Population { get; set; }
 
             public LocationInfo(double latitude = -1, double longitude = -1, int fips = -1, string combinedName = null, int population = 0)
             {

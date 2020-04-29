@@ -52,6 +52,10 @@ namespace COVID_19
         DateTime lastUpdatedFiles;
         bool isUpdating = false;
 
+        public DataSet DataSet { get { return dataSet; } }
+
+        public ObservableCollection<string> SelectedItems { get { return lbSelectedItemsSource; } }
+
         public MainWindow4()
         {
             InitializeComponent();
@@ -61,6 +65,126 @@ namespace COVID_19
             LoadData();
             lbSelected.ItemsSource = lbSelectedItemsSource;
             lbSelectedItemsSource.CollectionChanged += LbSelectedItemsSource_CollectionChanged;
+        }
+
+        public Dictionary<string, LocationData> GetRelevantDataSet()
+        {
+            var ret = new Dictionary<string, Location>();
+            var ret2 = new Dictionary<string, LocationData>();
+            var selectedItemsCount = lbSelectedItemsSource.Count;
+            var selectedItems = new List<string>();
+            Dictionary<string, Location> dataSource = null;
+            List<string> header;
+
+            switch (cmbArea.SelectedIndex)
+            {
+                case 0:
+                    header = dataSet.WorldHeader;
+                    dataSource = dataSet.World.Items;
+                    break;
+
+                case 1:
+                    header = dataSet.UsHeader;
+                    dataSource = dataSet.Us.Items;
+                    break;
+
+                case 2:
+                    header = dataSet.UsHeader;
+                    dataSource = countyStore;
+                    break;
+            }
+
+            if(selectedItemsCount > 0)
+            {
+                foreach(var itemName in lbSelectedItemsSource)
+                {
+                    ret.Add(itemName, dataSource[itemName]);
+                }
+            } else
+            {
+                ret = dataSource;
+            }
+
+            foreach(var keyValuePair in ret)
+            {
+                var myLocation = keyValuePair.Value;
+                List<long> data = null;
+
+                switch (cmbDataType.SelectedIndex)
+                {
+                    case 0:
+                        data = myLocation.Stats.Confirmed;
+                        break;
+                    case 1:
+                        data = myLocation.Stats.Deaths;
+                        break;
+                    case 2:
+                        data = myLocation.Stats.Recovered;
+                        break;
+                    case 3:
+                        data = myLocation.DataPoints.Deaths;
+                        break;
+                    case 4:
+                        data = myLocation.DataPoints.DeathsIncrease;
+                        break;
+                    case 5:
+                        data = myLocation.DataPoints.HospitalizedCumulative;
+                        break;
+                    case 6:
+                        data = myLocation.DataPoints.HospitalizedCurrently;
+                        break;
+                    case 7:
+                        data = myLocation.DataPoints.HospitalizedIncrease;
+                        break;
+                    case 8:
+                        data = myLocation.DataPoints.InIcuCumulative;
+                        break;
+                    case 9:
+                        data = myLocation.DataPoints.InIcuCurrently;
+                        break;
+                    case 10:
+                        data = myLocation.DataPoints.Negative;
+                        break;
+                    case 11:
+                        data = myLocation.DataPoints.NegativeIncrease;
+                        break;
+                    case 12:
+                        data = myLocation.DataPoints.OnVentilatorCumulative;
+                        break;
+                    case 13:
+                        data = myLocation.DataPoints.OnVentilatorCurrently;
+                        break;
+                    case 14:
+                        data = myLocation.DataPoints.Positive;
+                        break;
+                    case 15:
+                        data = myLocation.DataPoints.PositiveIncrease;
+                        break;
+                    case 16:
+                        data = myLocation.DataPoints.Recovered;
+                        break;
+                    case 17:
+                        data = myLocation.DataPoints.TotalTestResults;
+                        break;
+                    case 18:
+                        data = myLocation.DataPoints.TotalTestResultsIncrease;
+                        break;
+                }
+
+                var locationData = new LocationData();
+                locationData.Name = keyValuePair.Key;
+                locationData.Population = myLocation.LocationInformation.Population;
+                locationData.Confirmed = myLocation.Stats.Confirmed;
+                locationData.Data = ConvertToDouble(data);
+                ret2.Add(keyValuePair.Key, locationData);
+            }
+
+            return ret2;
+        }
+
+        private List<double> ConvertToDouble(List<long> data)
+        {
+            return data.ConvertAll(x => (double)x);
         }
 
         private void LbSelectedItemsSource_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -100,6 +224,105 @@ namespace COVID_19
             }
 
             return ret;
+        }
+
+        public void ApplyScaleFilters(ref LocationData locationData)
+        {
+            if(locationData.Data.Count == 0)
+            {
+                return;
+            }
+
+            var temp = locationData.Data.ToArray();
+            var tdata = new List<double>();
+
+            foreach (var t in temp)
+            {
+                tdata.Add(Convert.ToDouble(t));
+            }
+
+            if (useMortality || useSurvival)
+            {
+                for (int i = 0; i < tdata.Count; i++)
+                {
+                    long confirmed = locationData.Confirmed[i];
+
+                    if (confirmed != 0)
+                    {
+                        tdata[i] = (tdata[i] / confirmed) * 100;
+                    }
+                    else
+                    {
+                        tdata[i] = 0;
+                    }
+                }
+            }
+
+            if (normalize)
+            {
+                double last = tdata[locationData.Data.Count - 1];
+                int normalizer = Int32.Parse(txtNormalize.Text);
+
+                if (last > normalizer)
+                    while (tdata[0] < normalizer)
+                    {
+                        tdata.RemoveAt(0);
+                        tdata.Add(last);
+                    }
+            }
+
+            if (useLogScale)
+            {
+                var ldata = new List<double>();
+                foreach (var item in tdata)
+                {
+                    double log = Math.Log10(item);
+                    if (Double.IsInfinity(log))
+                    {
+                        log = 0;
+                    }
+                    ldata.Add(log);
+                }
+
+                tdata = ldata;
+            }
+
+            if (usePopulationPercentage)
+            {
+                long population = locationData.Population;
+                if (population != 0)
+                {
+                    for (int i = 0; i < tdata.Count; i++)
+                    {
+                        // the percentage of cases per population is probably better expressed as cases per 1000 people
+                        tdata[i] = (tdata[i] / population) * 1000;
+                    }
+                }
+            }
+
+            locationData.Data = tdata;
+
+        }
+
+        public void PlotGraph(Dictionary<string, LocationData> items)
+        {
+            var first = items.Keys.ToArray();
+            var name = first[0];
+            var headerLength = items[name].Data.Count;
+            var header = GetNewHeader(headerLength);
+
+            foreach(var keyValuePair in items)
+            {
+                var locationData = keyValuePair.Value;
+                var itemName = keyValuePair.Key;
+                var lg = new InteractiveDataDisplay.WPF.LineGraph();
+                lines.Children.Add(lg);
+                lg.Stroke = new SolidColorBrush(GetItemColor(itemName));
+                lg.Description = itemName;
+                lg.StrokeThickness = 2;
+                header = FormatHeader(header);
+                lg.Plot(header, locationData.Data);
+            }
         }
 
         private void PlotGraph(string itemName, Color color)
@@ -257,7 +480,7 @@ namespace COVID_19
 
             if(usePopulationPercentage)
             {
-                int population = myLocation.LocationInformation.Population;
+                long population = myLocation.LocationInformation.Population;
                 if(population != 0)
                 {
                     for(int i = 0; i < tdata.Count; i++)
@@ -718,7 +941,7 @@ namespace COVID_19
             }
         }
 
-        private void ResetGraph()
+        public void ResetGraph()
         {
             lines.Children.Clear();
             linegraph1.IsAutoFitEnabled = true;
@@ -862,6 +1085,13 @@ namespace COVID_19
             Window w = new About();
             w.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             w.Show();
+        }
+
+        private void btnRangeFilters_Click(object sender, RoutedEventArgs e)
+        {
+            var filterOptionsWindow = new FilterOptionsWindow();
+            filterOptionsWindow.Owner = this;
+            filterOptionsWindow.Show();
         }
     }
 }

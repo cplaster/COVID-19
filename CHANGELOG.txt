@@ -1,4 +1,16 @@
-﻿v1.0.0.8 @cplaster 2020-04-27T10:10:00
+﻿v1.0.0.9 @cplaster 2020-04-28T20:46:00
+
+* Refactored MainWindow4 into MainWindow 5
+  
+  - Added Percentile and Date range filters. These are only applied if the button is clicked. The scaling filters are are still applied automatically when toggled.
+
+  - Removed a lot of old and/or crufty code from the MainWindow codebehind. It's cleaner and should be much more sane (for now!).
+
+  - Reworked how the graphs are plotted, which should be more modular. Added the LocationData class to DataSet to facilitate this.
+
+  - Lots of other various refactoring and code cleanup.
+
+v1.0.0.8 @cplaster 2020-04-27T10:10:00
 
 * Fixed a bug when parsing location data.
 
