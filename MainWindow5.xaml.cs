@@ -461,7 +461,10 @@ namespace COVID_19
                 lg.Description = itemName;
                 lg.StrokeThickness = 2;
                 lg.Plot(header, locationData.Data);
-                lbSelectedItemsSource.Add(itemName);
+                if (!lbSelectedItemsSource.Contains(itemName))
+                {
+                    lbSelectedItemsSource.Add(itemName);
+                }
             }
 
             lbSelectedItems_noUpdates = false;

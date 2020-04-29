@@ -1,4 +1,8 @@
-﻿v1.0.0.9 @cplaster 2020-04-28T20:46:00
+﻿v1.0.0.10 @cplaster 2020-04-28T21:01:00
+
+* Fixed a rather nasty crash caused by items being wrongly re-added to the selected items list.
+
+v1.0.0.9 @cplaster 2020-04-28T20:46:00
 
 * Refactored MainWindow4 into MainWindow 5
   
