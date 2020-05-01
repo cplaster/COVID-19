@@ -41,6 +41,8 @@ namespace COVID_19
         DateTime lastUpdate;
         bool lbSelectedItems_noUpdates = false;
         private ObservableCollection<string> lbSelectedItemsSource = new ObservableCollection<string>();
+        private InteractiveDataDisplay.WPF.Legend legend;
+        private InteractiveDataDisplay.WPF.Figure legendParent;
         private Random randomR = new Random();
 
         public MainWindow5()
@@ -477,6 +479,8 @@ namespace COVID_19
 
             ApplyScaleFilters(ref locationData);
 
+
+
             var header = GetHeader(locationData.Data.Count);
             var lg = new InteractiveDataDisplay.WPF.LineGraph();
             lines.Children.Add(lg);
@@ -485,7 +489,6 @@ namespace COVID_19
             lg.StrokeThickness = 2;
             lg.Plot(header, locationData.Data);
         }
-
 
         private void ResetGraph()
         {
@@ -856,11 +859,16 @@ namespace COVID_19
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            var vc = FindVisualChild<InteractiveDataDisplay.WPF.Legend>(linegraph1);
-            if (vc != null)
+            legend = FindVisualChild<InteractiveDataDisplay.WPF.Legend>(linegraph1);
+            if (legend != null)
             {
-                //vc.VerticalAlignment = VerticalAlignment.Bottom;
-                vc.HorizontalAlignment = HorizontalAlignment.Left;
+                // this pushes the legend of the graph outside of the graph, to the right
+                // and keeps it from jumping all over the place every time a new element is added.
+                legend.HorizontalAlignment = HorizontalAlignment.Right;
+                legendParent = legend.Parent as InteractiveDataDisplay.WPF.Figure;
+                legend.RenderTransform = new TranslateTransform(250, 0);
+                var x = legend.Content as InteractiveDataDisplay.WPF.LegendItemsPanel;
+                x.Width = 200;
             }
         }
 
