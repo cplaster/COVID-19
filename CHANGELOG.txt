@@ -1,4 +1,31 @@
-﻿v1.0.0.11 @cplaster 2020-04-28T21:01:00
+﻿v1.0.0.12 @cplaster 2020-05-06T22:05:00
+
+* Made fixes for the error in calculating survival / mortality rates.
+  
+  - This adds selections Survival Rate, Mortality Rate, and Resolved to the DataType combobox for World and US Areas. Recovery data is not availible at the county level yet.
+
+* A bunch of UI fixes:
+  
+  - The Survival Rate and Mortality Rate checkboxes have been removed due to the above.
+
+  - The Apply Range Filter button is now a Apply / Remove Range Filter toggle button.
+
+  - Built the HSLColor class from the ground-up to manipulate colors in the HSL color space and output System.Windows.Media.Color.
+
+  - The simple algorithm which uses the HSLColor class needs some work, but it functions about as well or better than GetRandomColorOLD() does.
+
+v1.0.0.11 @cplaster 2020-05-06T18:55:00
+
+* Been playing around with a new HSL class I put together to try to get some better "random" colors for the graph plots.
+  Not really sure it works better as I have it now, but it might with some tweaking. Interesting side project, nonetheless
+
+* It occurs to me that I've been calculating the Survival / Mortality rate incorrectly. Currently, they are simply
+  (Recovered / Confirmed) and (Deaths / Confirmed) respectively. You can't tell what the survival / mortality rates are unless you limit the calculations
+  to cases that have resolved themselves. You don't compare the number of infected with the number of deaths because the infected cases havent all come to
+  a recover-or-died resolution yet. The actual survival rate should be (Recovered / (Recovered + Deaths)) and the actual mortality rate should be 
+  (Deaths / (Recovered + Deaths)). This makes a pretty big difference. You can also show a resolution rate, which is ((Recovered + Deaths) / Confirmed).
+
+v1.0.0.11 @cplaster 2020-04-28T21:01:00
 
 * Pushed the graph legend outside (and to the right) of the graph itself.
 

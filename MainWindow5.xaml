@@ -37,10 +37,9 @@
                     <ColumnDefinition Width="266" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <StackPanel>
+                <StackPanel Margin="0,30,0,0">
                     <Label FontWeight="Bold">Data Type</Label>
                     <ComboBox Name="cmbDataType" IsEditable="False" Margin="10,0,10,5" SelectionChanged="cmbDataType_SelectionChanged">
                         <ComboBoxItem IsSelected="True">Confirmed</ComboBoxItem>
@@ -85,16 +84,6 @@
                         <Label>Population Scale (per 1000)</Label>
                     </StackPanel>
 
-                    <StackPanel Name="stpMortality" Orientation="Horizontal" Margin="5,0,0,0" Visibility="Collapsed" ToolTip="Percentage of (deaths/confirmed)">
-                        <CheckBox Name="chbMortality" IsChecked="False" Margin="5,5,0,0" Checked="chbMortality_Checked" Unchecked="chbMortality_Unchecked" />
-                        <Label>Mortality Rate</Label>
-                    </StackPanel>
-
-                    <StackPanel Name="stpSurvival" Orientation="Horizontal" Margin="5,0,0,0" Visibility="Collapsed" ToolTip="Percentage of (recovered/confirmed">
-                        <CheckBox Name="chbSurvival" IsChecked="False" Margin="5,5,0,0" Checked="chbSurvival_Checked" Unchecked="chbSurvival_Unchecked" />
-                        <Label>Survival Rate</Label>
-                    </StackPanel>
-
                     <StackPanel Orientation="Vertical" Margin="10,5,0,0">
                         <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
                             <Label>Start Date:</Label>
@@ -112,6 +101,7 @@
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
                             <Button Name="btnApplyRange" Padding="5" Click="btnApplyRange_Click">Apply Range Filter</Button>
+                            <Button Name="btnRemoveRange" Padding="5" Click="btnRemoveRange_Click" Visibility="Collapsed">Remove Range Filter</Button>
                             <Button Name="btnClear" Margin="15,0,10,0" Padding="5" Content="Clear" Click="btnClear_Click" />
                         </StackPanel>
                     </StackPanel>
@@ -127,7 +117,7 @@
                     
                 </StackPanel>
                 <Grid Name="LegendGrid" Grid.RowSpan="2" Margin="0,50,0,0" Grid.Column="2" Height="575" />
-                <Grid Grid.Column="1"  Height="575" Margin="32,20,20,0">
+                <Grid Grid.Column="1"  Height="730" Margin="32,20,20,0">
                         <d3:Chart x:Name="linegraph1" BottomTitle="Day" LeftTitle="Confirmed">
                             <Grid Name="lines" />
                         </d3:Chart>

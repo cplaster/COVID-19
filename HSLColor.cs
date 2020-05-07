@@ -3,175 +3,164 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Drawing;
+using System.Windows.Media;
 
 namespace COVID_19
 {
-    public class HSLColor
+    class HSLColor
     {
-        // Private data members below are on scale 0-1
-        // They are scaled for use externally based on scale
-        private double hue = 1.0;
-        private double saturation = 1.0;
-        private double luminosity = 1.0;
+        double hue = 0;
+        double saturation = 0;
+        double luminence = 0;
+        double halpha = 0;
+        Color sColor;
 
-        private const double scale = 240.0;
-
-        public double Hue
+        public HSLColor(int alpha, int red, int green, int blue)
         {
-            get { return hue * scale; }
-            set { hue = CheckRange(value / scale); }
-        }
-        public double Saturation
-        {
-            get { return saturation * scale; }
-            set { saturation = CheckRange(value / scale); }
-        }
-        public double Luminosity
-        {
-            get { return luminosity * scale; }
-            set { luminosity = CheckRange(value / scale); }
+            sColor = Color.FromArgb((byte)alpha, (byte)red, (byte)green, (byte)blue);
+            ColorToHSL(sColor);
         }
 
-        private double CheckRange(double value)
-        {
-            if (value < 0.0)
-                value = 0.0;
-            else if (value > 1.0)
-                value = 1.0;
-            return value;
-        }
-
-        public override string ToString()
-        {
-            return String.Format("H: {0:#0.##} S: {1:#0.##} L: {2:#0.##}", Hue, Saturation, Luminosity);
-        }
-
-        public string ToRGBString()
-        {
-            Color color = (Color)this;
-            return String.Format("R: {0:#0.##} G: {1:#0.##} B: {2:#0.##}", color.R, color.G, color.B);
-        }
-
-        #region Casts to/from System.Drawing.Color
-        public static implicit operator Color(HSLColor hslColor)
-        {
-            double r = 0, g = 0, b = 0;
-            if (hslColor.luminosity != 0)
-            {
-                if (hslColor.saturation == 0)
-                    r = g = b = hslColor.luminosity;
-                else
-                {
-                    double temp2 = GetTemp2(hslColor);
-                    double temp1 = 2.0 * hslColor.luminosity - temp2;
-
-                    r = GetColorComponent(temp1, temp2, hslColor.hue + 1.0 / 3.0);
-                    g = GetColorComponent(temp1, temp2, hslColor.hue);
-                    b = GetColorComponent(temp1, temp2, hslColor.hue - 1.0 / 3.0);
-                }
-            }
-            return Color.FromArgb((int)(255 * r), (int)(255 * g), (int)(255 * b));
-        }
-
-        private static double GetColorComponent(double temp1, double temp2, double temp3)
-        {
-            temp3 = MoveIntoRange(temp3);
-            if (temp3 < 1.0 / 6.0)
-                return temp1 + (temp2 - temp1) * 6.0 * temp3;
-            else if (temp3 < 0.5)
-                return temp2;
-            else if (temp3 < 2.0 / 3.0)
-                return temp1 + ((temp2 - temp1) * ((2.0 / 3.0) - temp3) * 6.0);
-            else
-                return temp1;
-        }
-        private static double MoveIntoRange(double temp3)
-        {
-            if (temp3 < 0.0)
-                temp3 += 1.0;
-            else if (temp3 > 1.0)
-                temp3 -= 1.0;
-            return temp3;
-        }
-        private static double GetTemp2(HSLColor hslColor)
-        {
-            double temp2;
-            if (hslColor.luminosity < 0.5)  //<=??
-                temp2 = hslColor.luminosity * (1.0 + hslColor.saturation);
-            else
-                temp2 = hslColor.luminosity + hslColor.saturation - (hslColor.luminosity * hslColor.saturation);
-            return temp2;
-        }
-
-        public static implicit operator HSLColor(Color color)
-        {
-            HSLColor hslColor = new HSLColor();
-            hslColor.hue = color.GetHue() / 360.0; // we store hue as 0-1 as opposed to 0-360 
-            hslColor.luminosity = color.GetBrightness();
-            hslColor.saturation = color.GetSaturation();
-            return hslColor;
-        }
-        #endregion
-
-        public void SetRGB(int red, int green, int blue)
-        {
-            HSLColor hslColor = (HSLColor)Color.FromArgb(red, green, blue);
-            this.hue = hslColor.hue;
-            this.saturation = hslColor.saturation;
-            this.luminosity = hslColor.luminosity;
-        }
-
-        public HSLColor() { }
         public HSLColor(Color color)
         {
-            SetRGB(color.R, color.G, color.B);
-        }
-        public HSLColor(int red, int green, int blue)
-        {
-            SetRGB(red, green, blue);
-        }
-        public HSLColor(double hue, double saturation, double luminosity)
-        {
-            this.Hue = hue;
-            this.Saturation = saturation;
-            this.Luminosity = luminosity;
+            sColor = color;
+            ColorToHSL(sColor);
         }
 
-        public static System.Windows.Media.Color ColorFromHSL(double h, double s, double l)
+        public HSLColor(double alpha, double hue, double saturation, double luminence)
         {
-            double r = 0, g = 0, b = 0;
-            if (l != 0)
+            this.halpha = alpha;
+            this.hue = hue;
+            this.saturation = saturation;
+            this.luminence = luminence;
+        }
+
+        public Color ToColor()
+        {
+            Color color;
+
+            if(saturation == 0)
             {
-                if (s == 0)
-                    r = g = b = l;
-                else
+                byte l = (byte)(luminence * 255);
+                color = Color.FromArgb((byte)Math.Round(halpha), l, l, l);
+            } else
+            {
+                double temp1;
+                double temp2;
+                double thue;
+
+                if(luminence < 0.5)
                 {
-                    double temp2;
-                    if (l < 0.5)
-                        temp2 = l * (1.0 + s);
-                    else
-                        temp2 = l + s - (l * s);
+                    temp1 = luminence * (1 + saturation);
+                } else
+                {
+                    temp1 = (luminence + saturation) - (luminence * saturation);
+                }
 
-                    double temp1 = 2.0 * l - temp2;
+                temp2 = (2 * luminence) - temp1;
 
-                    r = GetColorComponent(temp1, temp2, h + 1.0 / 3.0);
-                    g = GetColorComponent(temp1, temp2, h);
-                    b = GetColorComponent(temp1, temp2, h - 1.0 / 3.0);
+                thue = hue / 360;
+
+                double r = thue + 0.333;
+                double g = thue;
+                double b = thue - 0.333;
+
+                double[] values = { r, g, b };
+                
+                for(int i = 0; i < values.Count(); i++)
+                {
+                    if(values[i] < 0)
+                    {
+                        values[i] += 1;
+                    }
+
+                    if(values[i] > 1)
+                    {
+                        values[i] -= 1;
+                    }
+
+                    if(6 * values[i] < 1)
+                    {
+                        values[i] = temp2 + (temp1 - temp2) * 6 * values[i];
+                    } else
+                    {
+                        if (2 * values[i] < 1) {
+                            values[i] = temp1;
+                        } else
+                        {
+                            if(3 * values[i] < 2)
+                            {
+                                values[i] = temp2 + (temp1 - temp2) * (0.666 - values[i]) * 6;
+                            } else
+                            {
+                                values[i] = temp2;
+                            }
+                        }
+                    }
+
+                    values[i] = Math.Round(values[i] * 255, 2);
+                }
+
+                color = Color.FromArgb((byte)Math.Round(halpha * 255), (byte)values[0], (byte)values[1], (byte)values[2]);
+
+            }
+
+            return color;
+        }
+
+        private void ColorToHSL(Color color)
+        {
+            halpha = color.A /255;
+            double red = color.R;
+            double green = color.G;
+            double blue = color.B;
+
+            double min;
+            double max;
+
+            min = Math.Min(red, green);
+            min = Math.Min(min, blue);
+
+            max = Math.Max(red, green);
+            max = Math.Max(max, blue);
+
+            // luminence is defined as the average of the minimum and maximum RGB values
+            luminence = (min + max) / 2;
+
+            //if min and max are the same, there is no saturation, otherwise the saturation value is defined as below
+            if(min != max)
+            {
+                if(luminence < 0.5)
+                {
+                    saturation = (max - min) / (max + min);
+                } else
+                {
+                    saturation = (max - min) / (2.0 - max - min);
                 }
             }
 
-            return System.Windows.Media.Color.FromRgb((byte)r, (byte)g, (byte)b);
+            //hue is defined depending on the max value.
+            // if red is max, hue = (green - blue) / (max - min)
+            // if green is max, hue = 2.0 + (blue - red) / (max - min)
+            // if blue is max, hue = 4.0 + (red - green) / (max - min)
 
-            //return Color.FromArgb((int)(255 * r), (int)(255 * g), (int)(255 * b));
+            if(red == max)
+            {
+                hue = (green - blue) / (max - min);
+            }
+            else if(green == max)
+            {
+                hue = 2.0 + (blue - red) / (max - min);
+            }
+            else if(blue == max)
+            {
+                hue = 4.0 + (red - green) / (max - min);
+            }
 
+            //convert hue to degrees
+            hue = hue * 360;
         }
 
-        public System.Windows.Media.Color GetColor()
-        {
-            Color c = (Color)this;
-            return System.Windows.Media.Color.FromRgb((byte)c.R, (byte)c.G, (byte)c.B);
-        }
 
     }
 }

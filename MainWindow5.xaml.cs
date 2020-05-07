@@ -26,9 +26,10 @@ namespace COVID_19
     {
         bool appStarting = true;
         string[] cmbAreaItems = { "World", "United States", "US County" };
-        string[] cmbDataTypeItems = { "Confirmed", "Deaths", "Recovered", "Deaths*", "Deaths Increase", "Hospitalized Cumulative", "Hospitalized Currently",
-            "Hospitalized Increase", "In ICU Cumulative", "In ICU Currently", "Negative", "Negative Increase", "On Ventilator Cumulative",
-            "On Ventilator Currently", "Positive", "Positive Increase", "Recovered*", "Total Test Results", "Total Test Results Increase"
+        string[] cmbDataTypeItems = { "Confirmed", "Deaths", "Recovered", "Survival Rate", "Mortality Rate", "Resolved", "Deaths*", "Deaths Increase", 
+            "Hospitalized Cumulative", "Hospitalized Currently", "Hospitalized Increase", "In ICU Cumulative", "In ICU Currently", "Negative",
+            "Negative Increase", "On Ventilator Cumulative", "On Ventilator Currently", "Positive", "Positive Increase", "Recovered*",
+            "Total Test Results", "Total Test Results Increase"
         };
         bool cmbDataType_isUpdating = false;
         Dictionary<string, Color> colors = new Dictionary<string, Color>();
@@ -44,6 +45,14 @@ namespace COVID_19
         private InteractiveDataDisplay.WPF.Legend legend;
         private InteractiveDataDisplay.WPF.Figure legendParent;
         private Random randomR = new Random();
+        private bool rangeFilterApplied = false;
+        private int rotationOffset = 20;
+        private int rotation = -20;
+        private int turns = 0;
+        private Random randomHue = new Random();
+        private Random randomSaturation = new Random();
+        private Random randomLuminosity = new Random();
+
 
         public MainWindow5()
         {
@@ -80,8 +89,6 @@ namespace COVID_19
                 {
                     item.Data.RemoveRange(endRemoveIndex + 1, item.Data.Count - (endRemoveIndex + 1));
                 }
-
-                int zzzz = 1;
             }
 
 
@@ -167,23 +174,6 @@ namespace COVID_19
             foreach (var t in temp)
             {
                 tdata.Add(Convert.ToDouble(t));
-            }
-
-            if ((chbMortality.IsChecked.HasValue && chbMortality.IsChecked == true) || (chbSurvival.IsChecked.HasValue && chbSurvival.IsChecked == true))
-            {
-                for (int i = 0; i < tdata.Count; i++)
-                {
-                    long confirmed = locationData.Confirmed[i];
-
-                    if (confirmed != 0)
-                    {
-                        tdata[i] = (tdata[i] / confirmed) * 100;
-                    }
-                    else
-                    {
-                        tdata[i] = 0;
-                    }
-                }
             }
 
             if (chbNormalize.IsChecked.HasValue && chbNormalize.IsChecked == true)
@@ -344,51 +334,60 @@ namespace COVID_19
                     data = myLocation.Stats.Recovered;
                     break;
                 case 3:
-                    data = myLocation.DataPoints.Deaths;
+                    data = myLocation.Stats.SurvivalRate;
                     break;
                 case 4:
-                    data = myLocation.DataPoints.DeathsIncrease;
+                    data = myLocation.Stats.MortalityRate;
                     break;
                 case 5:
-                    data = myLocation.DataPoints.HospitalizedCumulative;
+                    data = myLocation.Stats.Resolved;
                     break;
                 case 6:
-                    data = myLocation.DataPoints.HospitalizedCurrently;
+                    data = myLocation.DataPoints.Deaths;
                     break;
                 case 7:
-                    data = myLocation.DataPoints.HospitalizedIncrease;
+                    data = myLocation.DataPoints.DeathsIncrease;
                     break;
                 case 8:
-                    data = myLocation.DataPoints.InIcuCumulative;
+                    data = myLocation.DataPoints.HospitalizedCumulative;
                     break;
                 case 9:
-                    data = myLocation.DataPoints.InIcuCurrently;
+                    data = myLocation.DataPoints.HospitalizedCurrently;
                     break;
                 case 10:
-                    data = myLocation.DataPoints.Negative;
+                    data = myLocation.DataPoints.HospitalizedIncrease;
                     break;
                 case 11:
-                    data = myLocation.DataPoints.NegativeIncrease;
+                    data = myLocation.DataPoints.InIcuCumulative;
                     break;
                 case 12:
-                    data = myLocation.DataPoints.OnVentilatorCumulative;
+                    data = myLocation.DataPoints.InIcuCurrently;
                     break;
                 case 13:
-                    data = myLocation.DataPoints.OnVentilatorCurrently;
+                    data = myLocation.DataPoints.Negative;
                     break;
                 case 14:
-                    data = myLocation.DataPoints.Positive;
+                    data = myLocation.DataPoints.NegativeIncrease;
                     break;
                 case 15:
-                    data = myLocation.DataPoints.PositiveIncrease;
+                    data = myLocation.DataPoints.OnVentilatorCumulative;
                     break;
                 case 16:
-                    data = myLocation.DataPoints.Recovered;
+                    data = myLocation.DataPoints.OnVentilatorCurrently;
                     break;
                 case 17:
-                    data = myLocation.DataPoints.TotalTestResults;
+                    data = myLocation.DataPoints.Positive;
                     break;
                 case 18:
+                    data = myLocation.DataPoints.PositiveIncrease;
+                    break;
+                case 19:
+                    data = myLocation.DataPoints.Recovered;
+                    break;
+                case 20:
+                    data = myLocation.DataPoints.TotalTestResults;
+                    break;
+                case 21:
                     data = myLocation.DataPoints.TotalTestResultsIncrease;
                     break;
             }
@@ -402,9 +401,54 @@ namespace COVID_19
             return locationData;
         }
 
-        private Color GetRandomColor()
+        private Color GetRandomColorOLD()
         {
             return Color.FromRgb((byte)randomR.Next(70, 200), (byte)randomR.Next(50, 225), (byte)randomR.Next(50, 230));
+        }
+
+        private Color GetRandomColor()
+        {
+            rotation += rotationOffset;
+
+            double sat = 1;
+            double lum = 0.40;
+
+            // human eyes aren't terribly good at differentiating reds
+            if(rotation == 20)
+            {
+                rotation = 40;
+            }
+
+            // human eyes have especial trouble differentiating greens
+            if(rotation == 120)
+            {
+                rotation = 180;
+            }
+
+
+            if(rotation >= 360)
+            {
+                rotation -= 360;
+                turns++;
+            }
+
+            if(turns > 0)
+            {
+                sat = 0.5;
+
+                if(turns > 1)
+                {
+                    lum = 0.60;
+                }
+            }
+
+            //var hsl = new HSLColor(1, randomHue.Next(0, 360), randomSaturation.Next(1, 2) * 0.5, randomLuminosity.Next(30, 50) / 100.0);
+
+            var hsl = new HSLColor(1, rotation, sat, lum);
+
+            var color = hsl.ToColor();
+
+            return color;
         }
 
         public static bool InRange(DateTime? dateToCheck, DateTime? startDate, DateTime? endDate)
@@ -505,6 +549,17 @@ namespace COVID_19
             }
         }
 
+        private void RefreshGraph()
+        {
+            if (rangeFilterApplied)
+            {
+                btnApplyRange_Click(this, new RoutedEventArgs());
+            } else
+            {
+                GenerateGraph();
+            }
+        }
+
         #endregion
 
         #region Event Handlers 
@@ -524,62 +579,55 @@ namespace COVID_19
             ResetGraph();
             PlotItems(itemNames);
 
+            rangeFilterApplied = true;
+            btnApplyRange.Visibility = Visibility.Collapsed;
+            btnRemoveRange.Visibility = Visibility.Visible;
+
         }
 
         private void btnClear_Click(object sender, RoutedEventArgs e)
         {
+            rangeFilterApplied = false;
             lbSelectedItemsSource.Clear();
             ResetGraph();
         }
 
+        private void btnRemoveRange_Click(object sender, RoutedEventArgs e)
+        {
+            btnRemoveRange.Visibility = Visibility.Collapsed;
+            btnApplyRange.Visibility = Visibility.Visible;
+            rangeFilterApplied = false;
+            GenerateGraph();
+        }
+
         private void chbLogScale_Checked(object sender, RoutedEventArgs e)
         {
-            GenerateGraph();
+            RefreshGraph();
         }
 
         private void chbLogScale_Unchecked(object sender, RoutedEventArgs e)
         {
-            GenerateGraph();
-        }
-
-        private void chbMortality_Checked(object sender, RoutedEventArgs e)
-        {
-            GenerateGraph();
-        }
-
-        private void chbMortality_Unchecked(object sender, RoutedEventArgs e)
-        {
-            GenerateGraph();
+            RefreshGraph();
         }
 
         private void chbNormalize_Checked(object sender, RoutedEventArgs e)
         {
-            GenerateGraph();
+            RefreshGraph();
         }
 
         private void chbNormalize_Unchecked(object sender, RoutedEventArgs e)
         {
-            GenerateGraph();
+            RefreshGraph();
         }
 
         private void chbPercentage_Checked(object sender, RoutedEventArgs e)
         {
-            GenerateGraph();
+            RefreshGraph();
         }
 
         private void chbPercentage_Unchecked(object sender, RoutedEventArgs e)
         {
-            GenerateGraph();
-        }
-
-        private void chbSurvival_Checked(object sender, RoutedEventArgs e)
-        {
-            GenerateGraph();
-        }
-
-        private void chbSurvival_Unchecked(object sender, RoutedEventArgs e)
-        {
-            GenerateGraph();
+            RefreshGraph();
         }
 
         private void cmbArea_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -589,7 +637,7 @@ namespace COVID_19
             cmbCountry.Items.Clear();
             lbSelectedItemsSource.Clear();
             var sortedList = new List<string>();
-            int stopIndex = 3;
+            int stopIndex = 6;
 
             switch (cmbArea.SelectedIndex)
             {
@@ -613,7 +661,7 @@ namespace COVID_19
                         sortedList.Add(item);
                     }
 
-                    stopIndex = 19;
+                    stopIndex = 22;
 
                     break;
 
@@ -633,6 +681,9 @@ namespace COVID_19
                             }
                         }
                     }
+
+                    stopIndex = 2;
+
                     break;
             }
 
@@ -701,6 +752,7 @@ namespace COVID_19
             {
                 string t = cmbDataTypeItems[cmbDataType.SelectedIndex];
 
+                /*
                 if (stpMortality != null)
                 {
                     stpMortality.Visibility = Visibility.Collapsed;
@@ -730,13 +782,14 @@ namespace COVID_19
                         }
                         break;
                 }
+                */
 
                 if (linegraph1 != null)
                 {
                     linegraph1.LeftTitle = t;
                     UpdateGraphTitle();
                     lines.Children.Clear();
-                    GenerateGraph();
+                    RefreshGraph();
                 }
             }
         }
@@ -813,6 +866,11 @@ namespace COVID_19
                         if (item != null)
                         {
                             PlotItem(item);
+
+                            if(rangeFilterApplied)
+                            {
+                                btnApplyRange_Click(sender, new RoutedEventArgs());
+                            }
                         }
                         break;
                 }
@@ -872,8 +930,8 @@ namespace COVID_19
             }
         }
 
-        #endregion
 
+        #endregion
 
     }
 }

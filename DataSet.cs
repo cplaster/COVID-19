@@ -255,12 +255,31 @@ namespace COVID_19
                     us.Stats.Recovered[i] += state.Stats.Recovered[i];
                 }
 
+                state.Stats.ResizeList(state.Stats.SurvivalRate, dataWidth + 1);
+                state.Stats.ResizeList(state.Stats.MortalityRate, dataWidth + 1);
+                state.Stats.ResizeList(state.Stats.Resolved, dataWidth + 1);
+
 
                 for (int i = 0; i < dataPointWidth; i++)
                 {
 
                     if (state.DataPoints.Deaths.Count == dataPointWidth)
                     {
+                        var resolvedCases = state.DataPoints.Recovered[i] + state.DataPoints.Deaths[i];
+
+                        if (resolvedCases != 0)
+                        {
+                            double survivalRate = ((double)state.DataPoints.Recovered[i] / (double)resolvedCases) * 100;
+                            state.Stats.SurvivalRate[i] = (long)Math.Round(survivalRate);
+                            double mortalityRate = ((double)state.DataPoints.Deaths[i] / (double)resolvedCases) * 100;
+                            state.Stats.MortalityRate[i] = (long)Math.Round(mortalityRate);
+                        }
+                        else
+                        {
+                            state.Stats.SurvivalRate[i] = 0;
+                            state.Stats.MortalityRate[i] = 0;
+                        }
+
                         us.DataPoints.Deaths[i] += state.DataPoints.Deaths[i];
                         us.DataPoints.DeathsIncrease[i] += state.DataPoints.DeathsIncrease[i];
                         us.DataPoints.HospitalizedCumulative[i] += state.DataPoints.HospitalizedCumulative[i];
@@ -296,6 +315,10 @@ namespace COVID_19
                 totals.Stats.Recovered[i] = us.Stats.Recovered[i];
             }
 
+            totals.Stats.ResizeList(totals.Stats.SurvivalRate, dataWidth + 1);
+            totals.Stats.ResizeList(totals.Stats.MortalityRate, dataWidth + 1);
+            totals.Stats.ResizeList(totals.Stats.Resolved, dataWidth + 1);
+
             for (int i = 0; i < dataPointWidth; i++)
             {
                 totals.DataPoints.Deaths[i] += us.DataPoints.Deaths[i];
@@ -314,6 +337,21 @@ namespace COVID_19
                 totals.DataPoints.Recovered[i] += us.DataPoints.Recovered[i];
                 totals.DataPoints.TotalTestResults[i] += us.DataPoints.TotalTestResults[i];
                 totals.DataPoints.TotalTestResultsIncrease[i] += us.DataPoints.TotalTestResultsIncrease[i];
+                
+                var resolvedCases = totals.DataPoints.Recovered[i] + totals.DataPoints.Deaths[i];
+
+                if (resolvedCases != 0)
+                {
+                    double survivalRate = ((double)totals.DataPoints.Recovered[i] / (double)resolvedCases) * 100;
+                    totals.Stats.SurvivalRate[i] = (long)Math.Round(survivalRate);
+                    double mortalityRate = ((double)totals.DataPoints.Deaths[i] / (double)resolvedCases) * 100;
+                    totals.Stats.MortalityRate[i] = (long)Math.Round(mortalityRate);
+                }
+                else
+                {
+                    totals.Stats.SurvivalRate[i] = 0;
+                    totals.Stats.MortalityRate[i] = 0;
+                }
             }
         }
 
@@ -479,7 +517,7 @@ namespace COVID_19
                     }
                 }
 
-                if(country != null)
+                if (country != null)
                 {
                     var pop = item["Population"];
                     int population = 0;
@@ -491,6 +529,21 @@ namespace COVID_19
 
                     for(int i = 0; i < dataWidth; i++)
                     {
+                        var resolvedCases = country.Stats.Recovered[i] + country.Stats.Deaths[i];
+
+                        if (resolvedCases != 0)
+                        {
+                            double survivalRate = ((double)country.Stats.Recovered[i] / (double)resolvedCases) * 100;
+                            country.Stats.SurvivalRate[i] = (long)Math.Round(survivalRate);
+                            double mortalityRate = ((double)country.Stats.Deaths[i] / (double)resolvedCases) * 100;
+                            country.Stats.MortalityRate[i] = (long)Math.Round(mortalityRate);
+                        } else
+                        {
+                            country.Stats.SurvivalRate[i] = 0;
+                            country.Stats.MortalityRate[i] = 0;
+                        }
+
+                        country.Stats.Resolved[i] = resolvedCases;
                         worldTotals.Stats.Confirmed[i] += country.Stats.Confirmed[i];
                         worldTotals.Stats.Deaths[i] += country.Stats.Deaths[i];
                         worldTotals.Stats.Recovered[i] += country.Stats.Recovered[i];
@@ -835,24 +888,38 @@ namespace COVID_19
             List<long> confirmed;
             List<long> deaths;
             List<long> recovered;
+            List<long> survivalRate;
+            List<long> mortalityRate;
+            List<long> resolved;
 
             public List<long> Confirmed { get { return confirmed; } }
             public List<long> Deaths { get { return deaths; } }
             public List<long> Recovered { get { return recovered; } }
+            public List<long> SurvivalRate { get { return survivalRate; } }
+            public List<long> MortalityRate { get { return mortalityRate; } }
+            public List<long> Resolved { get { return resolved; } }
 
             public Statistics(int length)
             {
                 confirmed = new List<long>(length);
                 deaths = new List<long>(length);
                 recovered = new List<long>(length);
+                mortalityRate = new List<long>(length);
+                survivalRate = new List<long>(length);
+                resolved = new List<long>(length);
 
                 ResizeList(confirmed, length);
                 ResizeList(deaths, length);
                 ResizeList(recovered, length);
+                ResizeList(survivalRate, length);
+                ResizeList(mortalityRate, length);
+                ResizeList(resolved, length);
             }
 
-            private void ResizeList(List<long> list, int length)
+            internal void ResizeList(List<long> list, int length)
             {
+                list.Clear();
+
                 for (int i = 0; i < length; i++)
                 {
                     list.Add(0);
